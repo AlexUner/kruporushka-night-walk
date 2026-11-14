@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100d10">
+  <title>Крупорушка — точки прогулки</title>
+  <link rel="stylesheet" href="walk.css">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="map.css">
+  <script src="vendor/leaflet/leaflet.js" defer></script>
+  <script src="map.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="identity"><a class="wordmark" href="./">Крупорушка</a><span class="subtitle">Ночная прогулка</span></div>
+    <a class="map-link" href="./">← К прогулке</a>
+  </header>
+  <main class="editor">
+    <aside class="sidebar" aria-labelledby="editor-title">
+      <h1 id="editor-title">Точки прогулки</h1>
+      <p class="where">Озёрск, Калининградская область</p>
+      <p class="instruction">Выбери кадр и нажми на место съемки. Метку можно перетащить.</p>
+      <div id="stop-list" class="stop-list" aria-label="Кадры маршрута"></div>
+      <div class="map-actions">
+        <button type="button" id="center-map">Весь маршрут</button>
+        <button type="button" id="clear-pin" disabled>Убрать метку</button>
+      </div>
+      <form id="manual-pin" class="manual-pin">
+        <label for="coordinate">Координаты или ссылка с координатами</label>
+        <div>
+          <input id="coordinate" type="text" placeholder="54.408741, 22.014359" required autocomplete="off">
+          <button type="submit">Поставить</button>
+        </div>
+      </form>
+      <p id="map-warning" class="warning" hidden>Карта не загрузилась. Можно вставить координаты вручную.</p>
+      <div class="export">
+        <button type="button" id="copy-pins" disabled>Скопировать точки</button>
+        <button type="button" id="save-pins" disabled>Скачать JSON</button>
+      </div>
+      <textarea id="copy-fallback" aria-label="Точки для копирования" rows="5" readonly hidden></textarea>
+      <p id="status" role="status">Метки сохраняются в этом браузере.</p>
+    </aside>
+    <div id="map" role="region" aria-label="Карта Озёрска"></div>
+  </main>
+</body>
+</html>
+

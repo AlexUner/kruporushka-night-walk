@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100d10">
+  <meta name="description" content="Ночная фотопрогулка по Озёрску Калининградской области. Четыре кадра, одна дверь и кресло, которое все еще качается.">
+  <title>Крупорушка — ночная прогулка по Озёрску</title>
+  <link rel="stylesheet" href="walk.css">
+  <script src="walk.js" defer></script>
+</head>
+<body>
+  <main class="walk">
+    <header class="masthead">
+      <div class="identity">
+        <a class="wordmark" href="#street">Крупорушка</a>
+        <span class="subtitle">Ночная прогулка</span>
+      </div>
+      <a class="city" href="map.html" aria-label="Карта прогулки: Озёрск, Калининградская область">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5 6-11a6 6 0 1 0-12 0c0 6 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg>
+        <span>Карта Озёрска<small>Калининградская область</small></span>
+      </a>
+    </header>
+
+    <section class="viewport" aria-labelledby="scene-title">
+      <div class="backdrop" aria-hidden="true"></div>
+      <div class="stage" id="stage">
+        <div class="shot is-current" data-stop="street">
+          <img src="assets/street.webp" alt="Темная улица, брусчатка и несколько освещенных окон." width="960" height="1280" fetchpriority="high">
+        </div>
+        <div class="shot" data-stop="bakery" aria-hidden="true">
+          <img src="assets/bakery.webp" alt="Красная вывеска «ОЗЕРСКИЙ ХЛЕБ» над ночным тротуаром." width="1280" height="960">
+        </div>
+        <div class="shot" data-stop="bridge" aria-hidden="true">
+          <img src="assets/bridge.webp" alt="Перила моста и голые ветки в свете вспышки." width="960" height="1280">
+        </div>
+        <div class="shot" data-stop="door" aria-hidden="true">
+          <img src="assets/door.webp" alt="Дом с эркером и светлой дверью справа." width="960" height="1280">
+          <button class="door-pin" type="button" aria-label="Открыть дверь" disabled>
+            <span class="door-ring" aria-hidden="true"></span><span class="door-label">Открыть дверь</span>
+          </button>
+        </div>
+        <div class="shot" data-stop="room" aria-hidden="true">
+          <video id="chair" src="assets/chair.mp4" poster="assets/chair.webp" muted playsinline loop preload="none" aria-label="Пустое рыжее кресло качается среди черных стульев" width="640" height="480"></video>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+      <div class="scene-caption" aria-live="polite" aria-atomic="true">
+        <p class="scene-number" id="scene-number">01 / 05</p>
+        <h1 id="scene-title">Улица</h1>
+      </div>
+      <div class="scene-controls">
+        <button class="back-control" type="button" id="back-control" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>
+          <span>Назад</span>
+        </button>
+        <button class="scene-action" type="button" id="scene-action" data-kind="step">
+          <svg viewBox="0 0 96 56" class="step-icon" aria-hidden="true">
+            <path d="M10 44 48 27l38 17-38-7Z"/><path d="m27 23 21-10 21 10-21-5Z"/>
+          </svg>
+          <svg viewBox="0 0 24 24" class="turn-icon" aria-hidden="true"><path d="M20 19v-4a5 5 0 0 0-5-5H4m6 6-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24" class="replay-icon" aria-hidden="true"><path d="M4 12a8 8 0 1 1 2.3 5.7M4 12V5m0 7h7"/></svg>
+          <span>К пекарне</span>
+        </button>
+        <button class="motion-control" type="button" id="motion-control" hidden>Пауза</button>
+      </div>
+    </section>
+
+    <nav class="route" aria-label="Остановки прогулки">
+      <ol>
+        <li><a href="#street" aria-current="step"><img src="assets/street.webp" alt=""><span>Улица</span></a></li>
+        <li><a href="#bakery"><img src="assets/bakery.webp" alt=""><span>Хлеб</span></a></li>
+        <li><a href="#bridge"><img src="assets/bridge.webp" alt=""><span>Мост</span></a></li>
+        <li><a href="#door"><img src="assets/door.webp" alt=""><span>Дверь</span></a></li>
+        <li><a href="#room"><img src="assets/chair.webp" alt=""><span>Комната</span></a></li>
+      </ol>
+    </nav>
+    <noscript>Включите JavaScript, чтобы пройти по фотографиям и открыть дверь.</noscript>
+  </main>
+</body>
+</html>
+
