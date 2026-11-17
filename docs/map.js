@@ -24,15 +24,18 @@ tiles.on("tileload", () => { warning.hidden = true; });
 markerLayer.addTo(map);
 
 let active = 0;
-let pins = {};
+let pins = { ...walkLocations };
 function validPoint(point) {
   return Array.isArray(point) && point.length === 2 && point.every(Number.isFinite)
     && Math.abs(point[0]) <= 85 && Math.abs(point[1]) <= 180;
 }
 try {
-  const saved = JSON.parse(localStorage.getItem(storageKey) || "{}") || {};
-  for (const { id } of places) {
-    if (validPoint(saved[id])) pins[id] = saved[id];
+  const saved = JSON.parse(localStorage.getItem(storageKey));
+  if (saved) {
+    pins = {};
+    for (const { id } of places) {
+      if (validPoint(saved[id])) pins[id] = saved[id];
+    }
   }
 } catch {
   status.textContent = "Память браузера недоступна. Скопируй или скачай точки перед закрытием.";

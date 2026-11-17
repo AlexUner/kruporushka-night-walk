@@ -6,7 +6,10 @@
   <meta name="theme-color" content="#100d10">
   <meta name="description" content="Ночная фотопрогулка по Озёрску Калининградской области. Четыре кадра, одна дверь и кресло, которое все еще качается.">
   <title>Крупорушка — ночная прогулка по Озёрску</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="walk.css">
+  <script src="vendor/leaflet/leaflet.js" defer></script>
+  <script src="locations.js" defer></script>
   <script src="walk.js" defer></script>
 </head>
 <body>
@@ -18,65 +21,90 @@
       </div>
       <a class="city" href="map.html" aria-label="Карта прогулки: Озёрск, Калининградская область">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5 6-11a6 6 0 1 0-12 0c0 6 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg>
-        <span>Карта Озёрска<small>Калининградская область</small></span>
+        <span>Озёрск<small>Калининградская область</small></span>
       </a>
     </header>
 
     <section class="viewport" aria-labelledby="scene-title">
       <div class="backdrop" aria-hidden="true"></div>
-      <div class="stage" id="stage">
+      <h1 class="sr-only" id="scene-title" aria-live="polite">Улица</h1>
+      <div class="stage">
         <div class="shot is-current" data-stop="street">
           <img src="assets/street.webp" alt="Темная улица, брусчатка и несколько освещенных окон." width="960" height="1280" fetchpriority="high">
+          <a class="path-arrow path-forward" href="#bakery" aria-label="Идти к пекарне">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
         </div>
-        <div class="shot" data-stop="bakery" aria-hidden="true">
+        <div class="shot" data-stop="bakery" inert>
           <img src="assets/bakery.webp" alt="Красная вывеска «ОЗЕРСКИЙ ХЛЕБ» над ночным тротуаром." width="1280" height="960">
+          <a class="path-arrow path-forward" href="#bridge" aria-label="Повернуть к мосту">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
+          <a class="path-arrow path-back" href="#street" aria-label="Вернуться на улицу">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
         </div>
-        <div class="shot" data-stop="bridge" aria-hidden="true">
+        <div class="shot" data-stop="bridge" inert>
           <img src="assets/bridge.webp" alt="Перила моста и голые ветки в свете вспышки." width="960" height="1280">
+          <a class="path-arrow path-forward" href="#door" aria-label="Повернуть налево к Крупорушке">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
+          <a class="path-arrow path-back" href="#bakery" aria-label="Вернуться к пекарне">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
         </div>
-        <div class="shot" data-stop="door" aria-hidden="true">
+        <div class="shot" data-stop="door" inert>
           <img src="assets/door.webp" alt="Дом с эркером и светлой дверью справа." width="960" height="1280">
-          <button class="door-pin" type="button" aria-label="Открыть дверь" disabled>
-            <span class="door-ring" aria-hidden="true"></span><span class="door-label">Открыть дверь</span>
-          </button>
+          <a class="door-outline path-forward" href="#room" aria-label="Открыть дверь">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path class="door-edge" d="M24 11 78 15 87 88 31 91Z"/>
+              <path class="door-light" pathLength="1" d="M24 11 78 15 87 88 31 91Z"/>
+            </svg>
+          </a>
+          <a class="path-arrow path-back" href="#bridge" aria-label="Вернуться к мосту">
+            <svg viewBox="0 0 112 62" aria-hidden="true">
+              <path class="arrow-trail" d="M46 59H66"/>
+              <path d="M46 51V33H26L56 9 86 33H66V51Z"/>
+            </svg>
+          </a>
         </div>
-        <div class="shot" data-stop="room" aria-hidden="true">
+        <div class="shot" data-stop="room" inert>
           <video id="chair" src="assets/chair.mp4" poster="assets/chair.webp" muted playsinline loop preload="none" aria-label="Пустое рыжее кресло качается среди черных стульев" width="640" height="480"></video>
+          <div class="room-controls">
+            <a href="#door" aria-label="Выйти на улицу">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>
+            </a>
+            <button id="motion-control" type="button" data-playing="false" aria-label="Смотреть">
+              <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z"/></svg>
+              <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14m6-14v14"/></svg>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="shade" aria-hidden="true"></div>
-      <div class="scene-caption" aria-live="polite" aria-atomic="true">
-        <p class="scene-number" id="scene-number">01 / 05</p>
-        <h1 id="scene-title">Улица</h1>
-      </div>
-      <div class="scene-controls">
-        <button class="back-control" type="button" id="back-control" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>
-          <span>Назад</span>
-        </button>
-        <button class="scene-action" type="button" id="scene-action" data-kind="step">
-          <svg viewBox="0 0 96 56" class="step-icon" aria-hidden="true">
-            <path d="M10 44 48 27l38 17-38-7Z"/><path d="m27 23 21-10 21 10-21-5Z"/>
-          </svg>
-          <svg viewBox="0 0 24 24" class="turn-icon" aria-hidden="true"><path d="M20 19v-4a5 5 0 0 0-5-5H4m6 6-6-6 6-6"/></svg>
-          <svg viewBox="0 0 24 24" class="replay-icon" aria-hidden="true"><path d="M4 12a8 8 0 1 1 2.3 5.7M4 12V5m0 7h7"/></svg>
-          <span>К пекарне</span>
-        </button>
-        <button class="motion-control" type="button" id="motion-control" hidden>Пауза</button>
-      </div>
+      <aside class="minimap" aria-label="Мини-карта прогулки">
+        <div id="minimap" aria-hidden="true" inert></div>
+        <a class="minimap-open" href="map.html" aria-label="Открыть карту Озёрска">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 11 6-6m-6 0h6v6M11 13l-6 6m0-6v6h6"/></svg>
+        </a>
+        <a class="minimap-credit" href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>
+      </aside>
     </section>
-
-    <nav class="route" aria-label="Остановки прогулки">
-      <ol>
-        <li><a href="#street" aria-current="step"><img src="assets/street.webp" alt=""><span>Улица</span></a></li>
-        <li><a href="#bakery"><img src="assets/bakery.webp" alt=""><span>Хлеб</span></a></li>
-        <li><a href="#bridge"><img src="assets/bridge.webp" alt=""><span>Мост</span></a></li>
-        <li><a href="#door"><img src="assets/door.webp" alt=""><span>Дверь</span></a></li>
-        <li><a href="#room"><img src="assets/chair.webp" alt=""><span>Комната</span></a></li>
-      </ol>
-    </nav>
     <noscript>Включите JavaScript, чтобы пройти по фотографиям и открыть дверь.</noscript>
   </main>
 </body>
 </html>
-
