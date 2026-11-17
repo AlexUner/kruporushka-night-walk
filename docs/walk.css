@@ -220,7 +220,7 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   z-index: 3;
   right: clamp(15px, 3vw, 48px);
   bottom: max(12px, env(safe-area-inset-bottom));
-  width: 166px;
+  width: clamp(174px, 17vw, 258px);
   isolation: isolate;
 }
 .minimap-open {
@@ -293,16 +293,16 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   .city small { font-size: .56rem; }
   .city svg { width: 16px; height: 16px; }
   .stage { bottom: 86px; }
-  .minimap { width: 112px; right: 10px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .minimap { width: clamp(122px, 34vw, 164px); right: 10px; bottom: max(8px, env(safe-area-inset-bottom)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .walk { grid-template-rows: auto minmax(235px, 1fr); }
   .masthead { min-height: 55px; padding-block: 8px; }
   .stage { bottom: 0; }
-  .minimap { width: 96px; }
+  .minimap { width: clamp(110px, 16vw, 144px); }
 }
 @media (max-height: 650px) and (orientation: portrait) {
-  .minimap { width: 99px; }
+  .minimap { width: 116px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

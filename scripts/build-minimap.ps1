@@ -1,6 +1,7 @@
 param(
   [Parameter(Mandatory = $true)][string]$InputFile,
-  [string]$OutputFile = 'docs/assets/ozersk-map.svg'
+  [string]$OutputFile = 'docs/assets/ozersk-map.svg',
+  [switch]$Large
 )
 
 $ErrorActionPreference = 'Stop'
@@ -11,14 +12,17 @@ function ConvertTo-MercatorY([double]$Latitude) {
 }
 
 [xml]$osm = Get-Content -Raw -LiteralPath $InputFile
-$west = 22.0139
-$east = 22.0192
-$north = ConvertTo-MercatorY 54.41252
-$south = ConvertTo-MercatorY 54.40913
+$bounds = $osm.osm.bounds
+$west = [double]$bounds.minlon
+$east = [double]$bounds.maxlon
+$north = ConvertTo-MercatorY ([double]$bounds.maxlat)
+$south = ConvertTo-MercatorY ([double]$bounds.minlat)
+$width = if ($Large) { 480 } else { 160 }
+$height = if ($Large) { 396 } else { 180 }
 $nodes = @{}
 foreach ($node in $osm.osm.node) {
-  $x = 160 * ([double]$node.lon - $west) / ($east - $west)
-  $y = 180 * ($north - (ConvertTo-MercatorY ([double]$node.lat))) / ($north - $south)
+  $x = $width * ([double]$node.lon - $west) / ($east - $west)
+  $y = $height * ($north - (ConvertTo-MercatorY ([double]$node.lat))) / ($north - $south)
   $nodes[$node.id] = $x.ToString('0.#', $culture) + ',' + $y.ToString('0.#', $culture)
 }
 
@@ -30,6 +34,17 @@ $styles = [ordered]@{
   building = 'fill="#433535" stroke="#644643" stroke-width=".45"'
   lane = 'fill="none" stroke="#5b4a47" stroke-width="1.25"'
   road = 'fill="none" stroke="#8b6962" stroke-width="2.8"'
+}
+$background = '#231b20'
+if ($Large) {
+  $background = '#241b1e'
+  $styles.park = 'fill="#2e2a26" stroke="#3a332c" stroke-width=".65"'
+  $styles.water = 'fill="#304248" stroke="#465b5f" stroke-width=".8"'
+  $styles.river = 'fill="none" stroke="#506065" stroke-width="4.6"'
+  $styles.stream = 'fill="none" stroke="#43585b" stroke-width="1.5"'
+  $styles.building = 'fill="#48352d" stroke="#795648" stroke-width=".75"'
+  $styles.lane = 'fill="none" stroke="#6e5349" stroke-width="1.35"'
+  $styles.road = 'fill="none" stroke="#9c7662" stroke-width="3.2"'
 }
 $paths = @{}
 foreach ($style in $styles.Keys) {
@@ -58,9 +73,9 @@ foreach ($way in $osm.osm.way) {
 }
 
 $svg = @(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 180" width="160" height="180">'
+  ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {0} {1}" width="{0}" height="{1}">' -f $width,$height)
   '  <desc>Map data © OpenStreetMap contributors, ODbL. https://www.openstreetmap.org/copyright</desc>'
-  '  <path fill="#231b20" d="M0 0h160v180H0z"/>'
+  ('  <path fill="{0}" d="M0 0h{1}v{2}H0z"/>' -f $background,$width,$height)
   '  <g stroke-linejoin="round" stroke-linecap="round">'
 )
 foreach ($style in $styles.Keys) {

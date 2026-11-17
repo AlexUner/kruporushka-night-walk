@@ -16,6 +16,7 @@ const pulse = cursor.querySelector(".map-pulse");
 const target = document.querySelector("#minimap-target");
 const sweep = document.querySelector(".radar-sweep");
 const mapLink = document.querySelector(".minimap-open");
+const cityLink = document.querySelector(".city");
 const markers = document.querySelector("#minimap-stops");
 const progress = document.querySelector(".minimap-progress");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -25,16 +26,8 @@ let fadeAnimation;
 let pulseAnimation;
 let sweepAnimation;
 
-function mercatorY(latitude) {
-  return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
-}
-
-const { south, west, north, east } = walkMapBounds;
-const northY = mercatorY(north);
-const southY = mercatorY(south);
-const positions = Object.fromEntries(Object.entries(walkLocations).map(([id, [latitude, longitude]]) => {
-  const x = 160 * (longitude - west) / (east - west);
-  const y = 180 * (northY - mercatorY(latitude)) / (northY - southY);
+const positions = Object.fromEntries(Object.entries(walkLocations).map(([id, coordinates]) => {
+  const { x, y } = projectWalkPoint(coordinates, walkMapBounds, 160, 180);
   const mark = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   mark.setAttribute("cx", x);
   mark.setAttribute("cy", y);
@@ -52,6 +45,7 @@ function showLocation(scene, animate) {
   const next = scenes[current + 1];
   const nextId = next?.location || next?.id;
   progress.textContent = `0${current + 1} / 0${scenes.length}`;
+  mapLink.href = cityLink.href = `route.html#${scene.id}`;
   mapLink.setAttribute("aria-label", `Открыть карту Озёрска. Сейчас: ${scene.title}.${next ? ` Дальше: ${next.title}.` : ""}`);
   const hasTarget = Boolean(nextId && nextId !== id);
   target.setAttribute("visibility", hasTarget ? "visible" : "hidden");

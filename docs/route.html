@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100d10">
+  <meta name="description" content="Карта ночной фотопрогулки «Крупорушка» по Озёрску Калининградской области.">
+  <title>Карта прогулки — Крупорушка</title>
+  <link rel="stylesheet" href="walk.css?v=5">
+  <link rel="stylesheet" href="route.css">
+  <link rel="stylesheet" href="map-transition.css">
+  <script src="locations.js?v=5" defer></script>
+  <script src="route.js" defer></script>
+</head>
+<body class="route-page">
+  <header class="masthead">
+    <div class="identity"><a class="wordmark" href="./">Крупорушка</a><span class="subtitle">Ночная прогулка</span></div>
+    <a class="return-link" href="./">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>
+      К прогулке
+    </a>
+  </header>
+  <main class="route-content">
+    <div class="route-heading">
+      <h1>Карта прогулки</h1>
+      <p>Озёрск<span>Калининградская область</span></p>
+    </div>
+    <div class="route-layout">
+      <section class="route-map" aria-label="Карта остановок Озёрска">
+        <div class="route-plane">
+          <img class="route-terrain" src="assets/ozersk-route.svg" alt="" width="480" height="396" fetchpriority="high">
+          <svg class="route-grid" viewBox="0 0 480 396" aria-hidden="true">
+            <path d="M60 0v396m60-396v396m60-396v396m60-396v396m60-396v396m60-396v396m60-396v396M0 66h480M0 132h480M0 198h480M0 264h480M0 330h480"/>
+          </svg>
+        </div>
+        <div class="route-compass" aria-hidden="true">
+          <span>С</span>
+          <svg viewBox="0 0 28 28"><path d="M14 4l5 15-5-4-5 4 5-15Z"/><circle cx="14" cy="14" r="12"/></svg>
+        </div>
+        <div class="route-key"><span></span>Текущая остановка</div>
+        <a class="route-credit" href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>
+      </section>
+      <nav class="route-stops" aria-label="Остановки прогулки">
+        <ol>
+          <li><a href="./#street" data-stop="street"><img src="assets/street-thumb.webp" alt="" width="88" height="64"><span>Улица</span><b aria-hidden="true">01</b></a></li>
+          <li><a href="./#bridge" data-stop="bridge"><img src="assets/bridge-thumb.webp" alt="" width="88" height="64"><span>Мост</span><b aria-hidden="true">02</b></a></li>
+          <li><a href="./#bakery" data-stop="bakery"><img src="assets/bakery-thumb.webp" alt="" width="88" height="64"><span>Озерский хлеб</span><b aria-hidden="true">03</b></a></li>
+          <li><a href="./#door" data-stop="door"><img src="assets/door-thumb.webp" alt="" width="88" height="64"><span>Дверь Крупорушки</span><b aria-hidden="true">04</b></a></li>
+        </ol>
+        <a class="edit-points" href="map.html">Редактор точек</a>
+      </nav>
+    </div>
+  </main>
+</body>
+</html>

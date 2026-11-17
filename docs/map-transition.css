@@ -1,0 +1,11 @@
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+
+  .minimap-open, .route-map { view-transition-name: walk-map; }
+
+  ::view-transition-group(walk-map) {
+    animation-duration: 380ms;
+    animation-timing-function: var(--ease-out);
+  }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 310ms; }
+}
