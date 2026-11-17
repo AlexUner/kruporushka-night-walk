@@ -13,6 +13,9 @@ const motion = document.querySelector("#motion-control");
 const fade = document.querySelector(".scene-fade");
 const cursor = document.querySelector("#minimap-cursor");
 const pulse = cursor.querySelector(".map-pulse");
+const target = document.querySelector("#minimap-target");
+const sweep = document.querySelector(".radar-sweep");
+const mapLink = document.querySelector(".minimap-open");
 const markers = document.querySelector("#minimap-stops");
 const progress = document.querySelector(".minimap-progress");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -20,6 +23,7 @@ let current = -1;
 let mapStop;
 let fadeAnimation;
 let pulseAnimation;
+let sweepAnimation;
 
 function mercatorY(latitude) {
   return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
@@ -36,16 +40,41 @@ const positions = Object.fromEntries(Object.entries(walkLocations).map(([id, [la
   mark.setAttribute("cy", y);
   mark.setAttribute("r", 3);
   markers.append(mark);
-  return [id, { x, y }];
+  return [id, { x, y, mark }];
 }));
 
-function showLocation(id, animate) {
+function mapTransform({ x, y }) {
+  return `translate(${x}px, ${y}px)`;
+}
+
+function showLocation(scene, animate) {
+  const id = scene.location || scene.id;
+  const next = scenes[current + 1];
+  const nextId = next?.location || next?.id;
   progress.textContent = `0${current + 1} / 0${scenes.length}`;
+  mapLink.setAttribute("aria-label", `Открыть карту Озёрска. Сейчас: ${scene.title}.${next ? ` Дальше: ${next.title}.` : ""}`);
+  const hasTarget = Boolean(nextId && nextId !== id);
+  target.setAttribute("visibility", hasTarget ? "visible" : "hidden");
+  if (hasTarget) target.style.transform = mapTransform(positions[nextId]);
+
+  for (const [stop, { mark }] of Object.entries(positions)) {
+    const precedesScene = scenes.findIndex((item) => item.id === stop) < current;
+    mark.classList.toggle("map-past-stop", precedesScene && stop !== id);
+  }
+
   if (mapStop === id) return;
   mapStop = id;
-  const { x, y } = positions[id];
-  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  cursor.style.transform = mapTransform(positions[id]);
   if (!animate) return;
+  sweepAnimation?.cancel();
+  sweepAnimation = sweep.animate(
+    [
+      { opacity: 0, transform: "rotate(-65deg)" },
+      { opacity: .78, offset: .2 },
+      { opacity: 0, transform: "rotate(295deg)" }
+    ],
+    { duration: 820, easing: "linear" }
+  );
   pulseAnimation?.cancel();
   pulseAnimation = pulse.animate(
     [{ opacity: 0.85, transform: "scale(.65)" }, { opacity: 0, transform: "scale(1.85)" }],
@@ -83,7 +112,7 @@ function render() {
   }
 
   title.textContent = scene.title;
-  showLocation(scene.location || scene.id, animate);
+  showLocation(scene, animate);
 
   if (scene.id === "room") {
     chair.currentTime = 0;
@@ -108,6 +137,7 @@ reducedMotion.addEventListener("change", (event) => {
   chair.pause();
   fadeAnimation?.cancel();
   pulseAnimation?.cancel();
+  sweepAnimation?.cancel();
 });
 window.addEventListener("hashchange", render);
 function go(hash) {

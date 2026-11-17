@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#100d10">
   <meta name="description" content="Ночная фотопрогулка по Озёрску Калининградской области. Четыре кадра, одна дверь и кресло, которое все еще качается.">
   <title>Крупорушка — ночная прогулка по Озёрску</title>
-  <link rel="stylesheet" href="walk.css?v=3">
+  <link rel="stylesheet" href="walk.css?v=4">
   <script src="locations.js?v=3" defer></script>
-  <script src="walk.js?v=3" defer></script>
+  <script src="walk.js?v=4" defer></script>
 </head>
 <body>
   <main class="walk">
@@ -109,18 +109,49 @@
       <div class="scene-fade" aria-hidden="true"></div>
       <aside class="minimap" aria-label="Мини-карта прогулки">
         <a class="minimap-open" href="map.html" aria-label="Открыть карту Озёрска">
-          <svg viewBox="0 0 160 180" aria-hidden="true" class="minimap-graphic">
-            <image href="assets/ozersk-map.svg" width="160" height="180"/>
-            <g class="minimap-grid"><path d="M0 45h160M0 90h160M0 135h160M40 0v180M80 0v180M120 0v180"/></g>
-            <g id="minimap-stops"></g>
-            <g id="minimap-cursor">
-              <circle class="map-halo" r="10"/>
-              <circle class="map-pulse" r="8"/>
-              <circle class="map-dot" r="4.5"/>
+          <svg viewBox="0 0 180 180" aria-hidden="true" class="minimap-graphic">
+            <defs>
+              <clipPath id="radar-window"><circle cx="90" cy="90" r="75"/></clipPath>
+              <radialGradient id="radar-shade">
+                <stop offset=".38" stop-color="#140d12" stop-opacity="0"/>
+                <stop offset="1" stop-color="#140d12" stop-opacity=".78"/>
+              </radialGradient>
+              <linearGradient id="radar-beam" x1="0" y1="1" x2="1" y2="0">
+                <stop stop-color="#ff665c" stop-opacity=".03"/>
+                <stop offset="1" stop-color="#ff665c" stop-opacity=".5"/>
+              </linearGradient>
+            </defs>
+            <circle class="radar-bezel" cx="90" cy="90" r="86"/>
+            <g clip-path="url(#radar-window)">
+              <image href="assets/ozersk-map.svg" x="10" width="160" height="180"/>
+              <circle cx="90" cy="90" r="75" fill="url(#radar-shade)" stroke="none"/>
+              <g class="minimap-grid">
+                <path d="M15 90h150m-75-75v150"/>
+                <circle cx="90" cy="90" r="27"/>
+                <circle cx="90" cy="90" r="52"/>
+              </g>
+              <path class="radar-sweep" d="M90 90V15a75 75 0 0 1 48 17Z" fill="url(#radar-beam)" stroke="none"/>
+              <g transform="translate(10 0)">
+                <g id="minimap-stops"></g>
+                <g id="minimap-target" visibility="hidden">
+                  <path d="M0-6 6 0 0 6-6 0Z"/>
+                </g>
+                <g id="minimap-cursor">
+                  <circle class="map-halo" r="9"/>
+                  <circle class="map-pulse" r="8"/>
+                  <circle class="map-dot" r="4.5"/>
+                </g>
+              </g>
             </g>
+            <circle class="radar-rim" cx="90" cy="90" r="75"/>
+            <circle class="radar-ticks" cx="90" cy="90" r="81" pathLength="48"/>
+            <path class="radar-cardinals" d="M90 9v7m81 74h-7m-74 81v-7M9 90h7"/>
           </svg>
           <span class="minimap-compass" aria-hidden="true">С</span>
-          <span class="minimap-progress" aria-hidden="true"></span>
+          <span class="minimap-status" aria-hidden="true">
+            <span class="minimap-progress"></span>
+            <svg viewBox="0 0 24 24"><path d="M14 5h5v5m0-5-6 6M10 19H5v-5m0 5 6-6"/></svg>
+          </span>
         </a>
         <a class="minimap-credit" href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>
       </aside>
