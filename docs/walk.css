@@ -58,9 +58,11 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
 .viewport { position: relative; isolation: isolate; overflow: hidden; background: #100c0f; }
 .backdrop {
   position: absolute;
-  inset: -12%;
-  background: var(--scene-image, url("assets/street.webp")) center / cover;
-  filter: blur(38px) saturate(.8) brightness(.53);
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 14% 88%, #4d111a9e, transparent 58%),
+    radial-gradient(ellipse at 96% 43%, #38101a76, transparent 55%),
+    #100c0f;
 }
 .stage { position: absolute; inset: 0; display: grid; place-items: center; container-type: size; }
 .shot {
@@ -70,21 +72,37 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   position: relative;
   isolation: isolate;
   opacity: 0;
-  transform: scale(1.015);
-  transition: opacity 270ms var(--ease-out), transform 270ms var(--ease-out);
+  visibility: hidden;
+  transition: opacity 240ms var(--ease-out), visibility 240ms step-end;
 }
 .shot[data-stop="bakery"], .shot[data-stop="room"] {
   width: min(100cqw, 133.333cqh);
   aspect-ratio: 4 / 3;
 }
-.shot.is-current { opacity: 1; transform: none; z-index: 1; }
-.shot img, .shot video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.shot.is-current {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+  transition: opacity 240ms var(--ease-out), visibility 0s;
+}
+.shot picture, .shot img, .shot video { display: block; width: 100%; height: 100%; object-fit: contain; }
 .shot::after {
   position: absolute;
   inset: 0;
   content: "";
   pointer-events: none;
-  box-shadow: inset 0 0 42px 9px #100c0f85;
+  background: radial-gradient(ellipse at 12% 95%, #730d2239, transparent 52%);
+  box-shadow: inset 0 0 34px 6px #100c0f80;
+}
+.scene-fade {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 16% 85%, #aa173aab, transparent 69%),
+    radial-gradient(ellipse at 82% 24%, #7d172f8a, transparent 63%);
 }
 .path-arrow, .door-outline {
   position: absolute;
@@ -96,7 +114,7 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   opacity: 0;
   transition: opacity 250ms var(--ease-out);
 }
-.shot.is-current :is(.path-arrow, .door-outline) { opacity: 1; transition-delay: 110ms; }
+.shot.is-current :is(.path-arrow, .door-outline) { opacity: 1; transition-delay: 80ms; }
 .path-arrow {
   left: var(--x);
   top: var(--y);
@@ -106,28 +124,54 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   border-radius: 12px;
   color: #fff1d5;
 }
+.path-arrow::before, .door-outline::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -46%;
+  background: radial-gradient(ellipse, #ff334f80, #b31a3d2e 40%, transparent 71%);
+  opacity: 0;
+  transform: scale(.82);
+  transition: opacity 180ms var(--ease-out), transform 200ms var(--ease-out);
+  pointer-events: none;
+}
+.path-forward { color: #ffe3c7; }
+.shot.is-current .path-forward::before { animation: guide-glow 1s var(--ease-out) 160ms 2; }
+@keyframes guide-glow {
+  0%, 100% { opacity: 0; transform: scale(.86); }
+  38% { opacity: .9; transform: scale(1.1); }
+}
 .path-arrow svg {
   display: block;
   width: 100%;
   transform: rotate(var(--heading));
   overflow: visible;
   fill: #eee1c461;
-  filter: drop-shadow(0 1px 2px #000) drop-shadow(0 2px 5px #100606);
+  filter: drop-shadow(0 2px 2px #17090d);
   transition: transform 140ms var(--ease-out);
 }
+.path-forward svg { fill: #b53a42ab; }
 .path-arrow .arrow-trail { opacity: .55; }
-.path-back { --width: 17%; color: #e9d5c6; }
+.path-back { --width: 17%; color: #e9d5c6; opacity: 0; }
+.shot.is-current .path-back { opacity: .66; }
 .path-back svg { fill: #e9d5c62e; }
+.shot.is-current :is(.path-arrow, .door-outline):focus-visible::before {
+  animation: none; opacity: 1; transform: scale(1.12);
+}
 .path-arrow:active svg { transform: rotate(var(--heading)) scale(.94); }
 @media (hover: hover) and (pointer: fine) {
-  .path-arrow:hover svg { fill: #fff1d5c2; }
+  .shot.is-current .path-arrow:hover { opacity: 1; }
+  .shot.is-current :is(.path-arrow, .door-outline):hover::before {
+    animation: none; opacity: 1; transform: scale(1.12);
+  }
+  .path-arrow:hover svg { transform: rotate(var(--heading)) translateY(-5px); }
 }
-[data-stop="street"] .path-forward { --x: 81%; --y: 77%; --heading: 28deg; }
+[data-stop="street"] .path-forward { --x: 81%; --y: 77%; --heading: 208deg; }
 [data-stop="bakery"] .path-forward { --x: 45%; --y: 78%; --heading: -126deg; --width: 20%; }
-[data-stop="bakery"] .path-back { --x: 74%; --y: 83%; --heading: 132deg; --width: 13%; }
+[data-stop="bakery"] .path-back { --x: 76%; --y: 80%; --heading: 48deg; --width: 13%; }
 [data-stop="bridge"] .path-forward { --x: 26%; --y: 76%; --heading: -62deg; }
 [data-stop="bridge"] .path-back { --x: 56%; --y: 86%; --heading: 118deg; }
-[data-stop="door"] .path-back { --x: 37%; --y: 87%; --heading: 168deg; }
+[data-stop="door"] .path-back { --x: 69%; --y: 82%; --heading: 168deg; }
 .door-outline {
   left: 74.6%;
   top: 58.7%;
@@ -159,7 +203,7 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   display: flex;
   gap: 8px;
 }
-.room-controls :is(a, button), .minimap-open {
+.room-controls :is(a, button) {
   width: 44px;
   height: 44px;
   display: grid;
@@ -168,28 +212,48 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   border-radius: 5px;
   background: #1b1215e6;
 }
-.room-controls :is(a, button):hover, .minimap-open:hover { border-color: var(--accent); }
-.room-controls svg, .minimap-open svg { width: 20px; height: 20px; }
+.room-controls :is(a, button):hover { border-color: var(--accent); }
+.room-controls svg { width: 20px; height: 20px; }
 [data-playing="true"] .play-icon, [data-playing="false"] .pause-icon { display: none; }
 .minimap {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   right: clamp(15px, 3vw, 48px);
   bottom: max(15px, env(safe-area-inset-bottom));
-  width: 155px;
-  height: 150px;
+  width: 152px;
+  aspect-ratio: 8 / 9;
   isolation: isolate;
   border: 1px solid #cbb3a185;
   border-radius: 10px;
   background: #20191d;
   box-shadow: 0 6px 28px #0009;
 }
-#minimap { position: absolute; inset: 0; border-radius: inherit; background: #20191d; pointer-events: none; }
-#minimap .leaflet-tile-pane { filter: grayscale(.65) invert(.87) hue-rotate(175deg) brightness(.82); }
-.minimap-open { position: absolute; z-index: 500; top: 5px; right: 5px; }
+.minimap-open { display: block; position: absolute; inset: 0; border-radius: inherit; }
+.minimap:hover { border-color: #e5a99c; }
+.minimap-graphic { display: block; width: 100%; height: 100%; border-radius: inherit; }
+.minimap-grid { opacity: .1; stroke: #f3c3ac; stroke-width: .5; }
+#minimap-stops { fill: #40343b; stroke: #b69b9f; stroke-width: 1; }
+#minimap-cursor { transition: transform 320ms var(--ease-out); }
+.map-halo { fill: #ff485846; stroke: #ff594e70; stroke-width: 1; }
+.map-dot { fill: #ff675b; stroke: #ffead3; stroke-width: 1.5; }
+.map-pulse {
+  opacity: 0;
+  stroke: #ff7866;
+  stroke-width: 1.3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.minimap-compass, .minimap-progress {
+  position: absolute;
+  top: 7px;
+  color: #efc1b2;
+  font: .65rem/1 var(--mono);
+}
+.minimap-compass { right: 7px; }
+.minimap-progress { left: 7px; }
 .minimap-credit {
   position: absolute;
-  z-index: 500;
+  z-index: 1;
   bottom: 0;
   right: 0;
   border-radius: 4px 0 9px 0;
@@ -206,14 +270,13 @@ h1 { font: 400 clamp(1.9rem, 4.7vw, 4.4rem)/1.03 var(--serif); letter-spacing: -
   .city small { font-size: .56rem; }
   .city svg { width: 16px; height: 16px; }
   .stage { bottom: 86px; }
-  .minimap { width: 106px; height: 120px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); }
-  .minimap-open { top: -14px; right: -4px; }
+  .minimap { width: 106px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .walk { grid-template-rows: auto minmax(235px, 1fr); }
   .masthead { min-height: 55px; padding-block: 8px; }
   .stage { bottom: 0; }
-  .minimap { width: 106px; height: 113px; }
+  .minimap { width: 96px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

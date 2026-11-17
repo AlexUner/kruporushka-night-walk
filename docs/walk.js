@@ -1,56 +1,56 @@
 const scenes = [
   { id: "street", title: "Улица" },
-  { id: "bakery", title: "Озерский хлеб" },
   { id: "bridge", title: "Мост" },
+  { id: "bakery", title: "Озерский хлеб" },
   { id: "door", title: "Крупорушка" },
-  { id: "room", title: "Еще качается", image: "chair", location: "door" }
+  { id: "room", title: "Еще качается", location: "door" }
 ];
 
-const viewport = document.querySelector(".viewport");
 const title = document.querySelector("#scene-title");
 const shots = [...document.querySelectorAll(".shot")];
 const chair = document.querySelector("#chair");
 const motion = document.querySelector("#motion-control");
+const fade = document.querySelector(".scene-fade");
+const cursor = document.querySelector("#minimap-cursor");
+const pulse = cursor.querySelector(".map-pulse");
+const markers = document.querySelector("#minimap-stops");
+const progress = document.querySelector(".minimap-progress");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 let current = -1;
+let mapStop;
+let fadeAnimation;
+let pulseAnimation;
 
-const minimap = L.map("minimap", {
-  attributionControl: false,
-  zoomControl: false,
-  dragging: false,
-  keyboard: false,
-  doubleClickZoom: false,
-  scrollWheelZoom: false,
-  touchZoom: false,
-  boxZoom: false,
-  zoomSnap: 0.25
-});
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxNativeZoom: 19 }).addTo(minimap);
-
-const markers = Object.fromEntries(
-  Object.entries(walkLocations).map(([id, point]) => [
-    id, L.circleMarker(point, { interactive: false }).addTo(minimap)
-  ])
-);
-const bounds = L.latLngBounds(Object.values(walkLocations));
-function fitMap() {
-  minimap.fitBounds(bounds, { padding: [14, 16], animate: false });
+function mercatorY(latitude) {
+  return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
 }
-minimap.on("resize", fitMap);
-fitMap();
 
-function showLocation(location) {
-  for (const [id, marker] of Object.entries(markers)) {
-    const active = id === location;
-    marker.setStyle({
-      radius: active ? 5 : 3,
-      color: active ? "#fff2d5" : "#d2bbc0",
-      fillColor: active ? "#ff675b" : "#5c484f",
-      fillOpacity: 1,
-      weight: active ? 2 : 1
-    });
-    if (active) marker.bringToFront();
-  }
+const { south, west, north, east } = walkMapBounds;
+const northY = mercatorY(north);
+const southY = mercatorY(south);
+const positions = Object.fromEntries(Object.entries(walkLocations).map(([id, [latitude, longitude]]) => {
+  const x = 160 * (longitude - west) / (east - west);
+  const y = 180 * (northY - mercatorY(latitude)) / (northY - southY);
+  const mark = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  mark.setAttribute("cx", x);
+  mark.setAttribute("cy", y);
+  mark.setAttribute("r", 3);
+  markers.append(mark);
+  return [id, { x, y }];
+}));
+
+function showLocation(id, animate) {
+  progress.textContent = `0${current + 1} / 0${scenes.length}`;
+  if (mapStop === id) return;
+  mapStop = id;
+  const { x, y } = positions[id];
+  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  if (!animate) return;
+  pulseAnimation?.cancel();
+  pulseAnimation = pulse.animate(
+    [{ opacity: 0.85, transform: "scale(.65)" }, { opacity: 0, transform: "scale(1.85)" }],
+    { duration: 630, easing: "ease-out", delay: 200 }
+  );
 }
 
 function updatePlaybackButton() {
@@ -61,19 +61,29 @@ function updatePlaybackButton() {
 function render() {
   const next = Math.max(0, scenes.findIndex((scene) => `#${scene.id}` === location.hash));
   if (next === current) return;
-  const moveFocus = shots[current]?.contains(document.activeElement);
-  current = next;
-  const scene = scenes[current];
 
-  for (const shot of shots) {
-    const active = shot.dataset.stop === scene.id;
-    shot.classList.toggle("is-current", active);
-    shot.inert = !active;
+  const previous = shots[current];
+  const animate = Boolean(previous && !reducedMotion.matches);
+  const moveFocus = previous?.contains(document.activeElement);
+  const shot = shots[next];
+  const scene = scenes[next];
+  current = next;
+
+  for (const frame of shots) {
+    const active = frame === shot;
+    frame.classList.toggle("is-current", active);
+    frame.inert = !active;
+  }
+  if (animate) {
+    fadeAnimation?.cancel();
+    fadeAnimation = fade.animate(
+      [{ opacity: 0 }, { opacity: 0.7, offset: 0.32 }, { opacity: 0 }],
+      { duration: 480, easing: "ease-out" }
+    );
   }
 
-  viewport.style.setProperty("--scene-image", `url("assets/${scene.image || scene.id}.webp")`);
   title.textContent = scene.title;
-  showLocation(scene.location || scene.id);
+  showLocation(scene.location || scene.id, animate);
 
   if (scene.id === "room") {
     chair.currentTime = 0;
@@ -82,10 +92,8 @@ function render() {
     chair.pause();
   }
 
-  if (moveFocus) {
-    const control = shots[current].querySelector(".path-forward, button");
-    control.focus({ preventScroll: true });
-  }
+  if (moveFocus) shot.querySelector(".path-forward, button").focus({ preventScroll: true });
+  shots[current + 1]?.querySelector("img")?.decode().catch(() => {});
   updatePlaybackButton();
 }
 
@@ -96,19 +104,34 @@ motion.addEventListener("click", () => {
 chair.addEventListener("play", updatePlaybackButton);
 chair.addEventListener("pause", updatePlaybackButton);
 reducedMotion.addEventListener("change", (event) => {
-  if (event.matches) chair.pause();
+  if (!event.matches) return;
+  chair.pause();
+  fadeAnimation?.cancel();
+  pulseAnimation?.cancel();
 });
 window.addEventListener("hashchange", render);
+function go(hash) {
+  location.hash = hash;
+  render();
+}
+document.querySelector(".walk").addEventListener("click", (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.altKey
+    || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+  event.preventDefault();
+  go(link.hash);
+});
 window.addEventListener("keydown", (event) => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
 
-  const forward = event.key === "ArrowRight" || event.key === "ArrowDown"
-    || (event.key === "ArrowLeft" && scenes[current].id === "bridge");
+  const turnLeft = ["bridge", "bakery"].includes(scenes[current].id) && event.key === "ArrowLeft";
+  const forward = event.key === "ArrowRight" || event.key === "ArrowDown" || turnLeft;
   const back = event.key === "ArrowLeft" || event.key === "ArrowUp";
   const next = current + (forward ? 1 : back ? -1 : 0);
   if (next !== current && scenes[next]) {
     event.preventDefault();
-    location.hash = scenes[next].id;
+    go(scenes[next].id);
   }
 });
 render();

@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100d10">
   <title>Крупорушка — точки прогулки</title>
-  <link rel="stylesheet" href="walk.css">
+  <link rel="stylesheet" href="walk.css?v=3">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="map.css">
   <script src="vendor/leaflet/leaflet.js" defer></script>
-  <script src="locations.js" defer></script>
-  <script src="map.js" defer></script>
+  <script src="locations.js?v=3" defer></script>
+  <script src="map.js?v=3" defer></script>
 </head>
 <body>
   <header class="masthead">
@@ -34,7 +34,7 @@
           <button type="submit">Поставить</button>
         </div>
       </form>
-      <p id="map-warning" class="warning" hidden>Карта не загрузилась. Можно вставить координаты вручную.</p>
+      <p id="map-warning" class="warning" hidden>Подробная карта недоступна. На встроенной карте можно отмечать места рядом с маршрутом.</p>
       <div class="export">
         <button type="button" id="copy-pins" disabled>Скопировать точки</button>
         <button type="button" id="save-pins" disabled>Скачать JSON</button>

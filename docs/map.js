@@ -12,11 +12,19 @@ const coordinate = find("#coordinate");
 const copyFallback = find("#copy-fallback");
 const warning = find("#map-warning");
 const markerLayer = L.layerGroup();
-const map = L.map("map", { zoomControl: false }).setView(center, 16);
+const { south, west, north, east } = walkMapBounds;
+const neighborhood = [[south, west], [north, east]];
+const map = L.map("map", { zoomControl: false }).fitBounds(neighborhood, { maxZoom: 17 });
+L.imageOverlay("assets/ozersk-map.svg", neighborhood, {
+  pane: "tilePane",
+  zIndex: 0,
+  alt: "Улицы и дома рядом с маршрутом"
+}).addTo(map);
 L.control.zoom({ zoomInTitle: "Увеличить", zoomOutTitle: "Уменьшить" }).addTo(map);
 const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 20,
   maxNativeZoom: 19,
+  zIndex: 1,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 tiles.on("tileerror", () => { warning.hidden = false; });
